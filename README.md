@@ -16,7 +16,6 @@ This repo contains all the algorithms in our experiments, as shown in the follow
 
 This repo also contains a small demo to show how to use this algorithms with a small dataset.
 
-%- `Sliding_sketch_technicual_report.pdf` can help you understand the paper better.%
 - `data`: traces for test, each 8 bytes in a trace is a item.
 - `src`
   - `Membership`: Membership query algorithms (Sl-BF,FBF, SW-BF).
