@@ -14,7 +14,7 @@ Sliding_Bloom::~Sliding_Bloom(){
 }
 
 void Sliding_Bloom::Init(const Data &data, ulong time){
-    Clock_Go(time * LENGTH / CYCLE);
+    Clock_Go(time * (LENGTH / CYCLE));
     for(uint i = 0;i < HASH_NUM;++i){
         uint position = data.Hash(i) % STAGE_LEN + i * STAGE_LEN;
         future->Set(position);
@@ -22,7 +22,7 @@ void Sliding_Bloom::Init(const Data &data, ulong time){
 }
 
 bool Sliding_Bloom::Query(const Data &data, ulong time){
-    Clock_Go(time * LENGTH / CYCLE);
+    Clock_Go(time * (LENGTH / CYCLE));
     for(uint i = 0;i < HASH_NUM;++i){
         uint position = data.Hash(i) % STAGE_LEN + i * STAGE_LEN;
         if(!future->Get(position) && !now->Get(position))
