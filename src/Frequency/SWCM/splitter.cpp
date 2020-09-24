@@ -390,7 +390,7 @@ void Bucket::phaseout(int i1, int i2, int time_stamp){
                 int v_prime = myqf.counter / (myqf.last - myqf.init + 1);
                 myv = myv - (t*v_prime);
                 myq.front().counter -= (t * v_prime);
-                myq.front().init = time_stamp - cycle + 1;//= myq.front().init + 1;?
+                myq.front().init = time_stamp - cycle + 1;
             }
         }
     }
