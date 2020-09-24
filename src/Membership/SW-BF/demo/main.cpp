@@ -59,11 +59,11 @@ void errorrate()
 	{
 		//read a packet
 		fread(packet[cnt], 8, 1, file);
-		if (ss.count(packet[cnt]) > 0)
-		{
-			memset(packet[cnt], 0, sizeof(char) * 10);
-			continue;
-		}
+		//if (ss.count(packet[cnt]) > 0)
+		//{
+		//	memset(packet[cnt], 0, sizeof(char) * 10);
+		//	continue;
+		//}
 		ss.insert(packet[cnt]);
 		//cout << packet[cnt] << endl;
 		//read a packet
