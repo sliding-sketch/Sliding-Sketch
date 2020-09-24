@@ -8,6 +8,7 @@
 #include <stdlib.h>
 #include "../summary.h"
 #include "../data.h"
+#include "../definition.h"
 
 //#define TOP_SIZE 170000
 //#define NUM 100000
@@ -36,11 +37,10 @@ void Read_File(int argc, char* argv[]){
     Data* dat = new Data[cycle + 1];
     memset(dat, 0, (cycle + 1) * sizeof(Data));
 
-    int memory_para1 = 200000;
-    int memory_para2 = 10000;
+    int memory_para = 200; // KB memory
 
     
-    Summary summary(memory_para1, memory_para2, cycle, para_lambda);
+    Summary summary(memory_para*1024, DATA_LEN, cycle, para_lambda);
 
 
     unsigned long long int num = 1;
