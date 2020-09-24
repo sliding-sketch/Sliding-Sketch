@@ -32,16 +32,6 @@ int main(int argc,char ** argv)
 	int k = 10000;
 	int thre = 1000;
 	const char * in_file = "../../../../data/formatted00.dat";
-	int row_length=(mymemory * 1024 - 4*k)/hash_number;
-	/*
-	int cycle = 10000;
-	int hash_number = 100;
-	int row_length = 10000;
-	int input_num_max = 100001;
-	int input_num = 0;
-	int k = 5000;
-	int thre = 70;
-	*/
 	mp.clear();
 	int input_num = 0;
 	Data *dat = new Data[cycle];
@@ -49,7 +39,7 @@ int main(int argc,char ** argv)
 
 	FILE* file = fopen(in_file, "rb");
 	Data packet;
-	wcss cm(0, cycle, hash_number, row_length, k);
+	wcss cm(cycle, mymemory*1024, DATA_LEN);
 	double real = 0, estiall = 0, estireal = 0;
 	double are=0;
 	while (fread(packet.str, DATA_LEN, 1, file) > 0) {
