@@ -45,7 +45,7 @@ public:
     //int q_memory_count();
 
     int query(const unsigned char* str, int length);//query an item
-    int count_query(const unsigned char* str, int length);
+  // int count_query(const unsigned char* str, int length);
 
     void phaseout(int i1, int i2, int time_stamp);//algorithm speedup
     void print(int i1, int i2);
