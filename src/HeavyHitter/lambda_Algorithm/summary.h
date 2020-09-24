@@ -12,7 +12,7 @@
 #include <list>
 #include "data.h"
 #include "hash_class.h"
-#include "defintion.h" 
+#include "definition.h" 
 using namespace std;
 
 class Counter;
