@@ -13,7 +13,7 @@ class Recent_Sketch{
 public :
     unsigned int clock_pos;
     unsigned int len;
-    unsigned int step;
+    double step;
     unsigned int cycle_num;
     int row_length;
     int hash_number;
@@ -21,7 +21,7 @@ public :
     unsigned long long int last_time;
 
     Recent_Sketch(unsigned int c, unsigned int l, int _row_length, int _hash_number, int _field_num):
-        len(l),step(l*(_field_num-1)/c),row_length(_row_length),hash_number(_hash_number),field_num(_field_num){
+        len(l),step((double)l*(_field_num-1)/c),row_length(_row_length),hash_number(_hash_number),field_num(_field_num){
         clock_pos = 0;
         last_time = 0;
         cycle_num = 0;

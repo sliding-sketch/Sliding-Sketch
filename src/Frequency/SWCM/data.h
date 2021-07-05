@@ -7,6 +7,7 @@
 class Data{
 public:
     unsigned char str[DATA_LEN];
+    int timestamp;
     Data& operator = (Data an);
 };
 

@@ -95,6 +95,238 @@ void Bucket::update(const unsigned char *str, int length, int time_stamp){
             phaseout(i1, i2, time_stamp);
     }
 }
+/*
+void Bucket::cu_update(const unsigned char* str, int length, int time_stamp){
+    int my_min_v = 0x7fffffff;
+    for(int i = 0; i < hash_number;i ++){
+        my_min_v = my_min(my_min_v, v[(Hash(str, i, length) % row_length) + i * row_length]);
+    }
+    for(int i1 = 0; i1 < hash_number; i1++){
+        for(int i2 = 0; i2 < row_length; i2++){
+            vector<Splitter> myq = q[i1 * row_length + i2];
+            int myv = v[i1 * row_length + i2];
+            if(!myq.empty()){
+                if(myq.front().init == time_stamp - cycle){
+                    Splitter first = myq.front();
+                    int v_prime = first.counter / (first.last - first.init + 1);
+                    myv = myv - v_prime;
+                    first.counter = first.counter - v_prime;
+                    first.init = first.init + 1;
+                    if(first.init > first.last){
+                        myq.erase(myq.begin());
+                    }else{
+                        myq.front().counter = first.counter;
+                        myq.front().init = first.init;
+                        myq.front().last = first.last;
+                    }
+                }
+                v[i1 * row_length + i2] = myv;
+            }
+
+            if( (Hash(str, i1, length) % row_length == i2) && (v[i1 * row_length + i2] == my_min_v) ){
+                myv = myv + 1;
+                if(myq.empty()){
+                    Splitter new_s;
+                    new_s.counter = 1;
+                    new_s.init = time_stamp;
+                    new_s.last = time_stamp;
+                    myq.push_back(new_s);
+                }else{
+                    Splitter last = myq.back();
+                    if(last.counter < (tau * cycle / row_length)){
+                        myq.back().counter ++;
+                        myq.back().last = time_stamp;
+                    }
+                    else{
+                        if(myq.size() >= 2){
+                            vector<Splitter>::iterator iter = myq.end();
+                            iter = iter - 2;
+                            Splitter pred = *iter;
+                            if(err(pred, last) <= mu){
+                                myq.back().counter = myq.back().counter + pred.counter;
+                                myq.back().init = pred.init;
+                                myq.back().last = time_stamp;
+                                myq.back().counter ++;
+                                myq.erase(iter);
+                            }
+                            else{
+                                Splitter new_s;
+                                new_s.counter = 1;
+                                new_s.init = time_stamp;
+                                new_s.last = time_stamp;
+                                myq.push_back(new_s);
+                            }
+                        }else{
+                            Splitter new_s;
+                            new_s.counter = 1;
+                            new_s.init = time_stamp;
+                            new_s.last = time_stamp;
+                            myq.push_back(new_s);
+                        }
+                    }
+                }
+            }
+            q[i1 * row_length + i2] = myq;
+            v[i1 * row_length + i2] = myv;
+        }
+    }
+}*/
+
+/*
+static int Count_Hash[2] = {-1, 1};
+
+void Bucket::count_update(const unsigned char* str, int length, int time_stamp){
+    //positive
+    for(int i1 = 0; i1 < hash_number; i1++){
+        for(int i2 = 0; i2 < row_length; i2++){
+            vector<Splitter> myq = q[i1 * row_length + i2];
+            int myv = v[i1 * row_length + i2];
+            if(!myq.empty()){
+                if(myq.front().init == time_stamp - cycle){
+                    Splitter first = myq.front();
+                    int v_prime = first.counter / (first.last - first.init + 1);
+                    myv = myv - v_prime;
+                    first.counter = first.counter - v_prime;
+                    first.init = first.init + 1;
+                    if(first.init > first.last){
+                        myq.erase(myq.begin());
+                    }else{
+                        myq.front().counter = first.counter;
+                        myq.front().init = first.init;
+                        myq.front().last = first.last;
+                    }
+                }
+                v[i1 * row_length + i2] = myv;
+            }
+
+            if(Hash(str, i1, length) % row_length == i2){
+                int position = Hash(str, i1, length) % row_length + i1 * row_length;
+                if(Count_Hash[(str[length - 1] + position) & 1] == 1){
+                myv = myv + 1;
+                if(myq.empty()){
+                    Splitter new_s;
+                    new_s.counter = 1;
+                    new_s.init = time_stamp;
+                    new_s.last = time_stamp;
+                    myq.push_back(new_s);
+                }else{
+                    Splitter last = myq.back();
+                    if(last.counter < (tau * cycle / row_length)){
+                        myq.back().counter ++;
+                        myq.back().last = time_stamp;
+                    }
+                    else{
+                        if(myq.size() >= 2){
+                            vector<Splitter>::iterator iter = myq.end();
+                            iter = iter - 2;
+                            Splitter pred = *iter;
+                            if(err(pred, last) <= mu){
+                                myq.back().counter = myq.back().counter + pred.counter;
+                                myq.back().init = pred.init;
+                                myq.back().last = time_stamp;
+                                myq.back().counter ++;
+                                myq.erase(iter);
+                            }
+                            else{
+                                Splitter new_s;
+                                new_s.counter = 1;
+                                new_s.init = time_stamp;
+                                new_s.last = time_stamp;
+                                myq.push_back(new_s);
+                            }
+                        }else{
+                            Splitter new_s;
+                            new_s.counter = 1;
+                            new_s.init = time_stamp;
+                            new_s.last = time_stamp;
+                            myq.push_back(new_s);
+                        }
+                    }
+                }
+            }
+            }
+            q[i1 * row_length + i2] = myq;
+            v[i1 * row_length + i2] = myv;
+        }
+    }
+
+    
+    //negative
+    for(int i1 = 0; i1 < hash_number; i1++){
+        for(int i2 = 0; i2 < row_length; i2++){
+            vector<Splitter> myq = q_d[i1 * row_length + i2];
+            int myv = v_d[i1 * row_length + i2];
+            if(!myq.empty()){
+                if(myq.front().init == time_stamp - cycle){
+                    Splitter first = myq.front();
+                    int v_prime = first.counter / (first.last - first.init + 1);
+                    myv = myv - v_prime;
+                    first.counter = first.counter - v_prime;
+                    first.init = first.init + 1;
+                    if(first.init > first.last){
+                        myq.erase(myq.begin());
+                    }else{
+                        myq.front().counter = first.counter;
+                        myq.front().init = first.init;
+                        myq.front().last = first.last;
+                    }
+                }
+                v_d[i1 * row_length + i2] = myv;
+            }
+            if(Hash(str, i1, length) % row_length == i2){
+                int position = Hash(str, i1, length) % row_length + i1 * row_length;
+                if(Count_Hash[(str[length - 1] + position) & 1] == -1){
+                myv = myv + 1;
+                if(myq.empty()){
+                    Splitter new_s;
+                    new_s.counter = 1;
+                    new_s.init = time_stamp;
+                    new_s.last = time_stamp;
+                    myq.push_back(new_s);
+                }else{
+                    Splitter last = myq.back();
+                    if(last.counter < (tau * cycle / row_length)){
+                        myq.back().counter ++;
+                        myq.back().last = time_stamp;
+                    }
+                    else{
+                        if(myq.size() >= 2){
+                            vector<Splitter>::iterator iter = myq.end();
+                            iter = iter - 2;
+                            Splitter pred = *iter;
+                            if(err(pred, last) <= mu){
+                                myq.back().counter = myq.back().counter + pred.counter;
+                                myq.back().init = pred.init;
+                                myq.back().last = time_stamp;
+                                myq.back().counter ++;
+                                myq.erase(iter);
+                            }
+                            else{
+                                Splitter new_s;
+                                new_s.counter = 1;
+                                new_s.init = time_stamp;
+                                new_s.last = time_stamp;
+                                myq.push_back(new_s);
+                            }
+                        }else{
+                            Splitter new_s;
+                            new_s.counter = 1;
+                            new_s.init = time_stamp;
+                            new_s.last = time_stamp;
+                            myq.push_back(new_s);
+                        }
+                    }
+                }
+            }
+            }
+            q_d[i1 * row_length + i2] = myq;
+            v_d[i1 * row_length + i2] = myv;
+        }
+    }
+
+
+
+}*/
 
 
 int Bucket::query(const unsigned char* str, int length){
@@ -107,6 +339,26 @@ int Bucket::query(const unsigned char* str, int length){
     return my_min_num;
 }
 
+/*
+int Bucket::count_query(const unsigned char* str, int length){
+    int* n = new int[hash_number];
+    memset(n, 0, hash_number * sizeof(unsigned int));
+
+    for(int i = 0;i < hash_number;++i){
+        int position = Hash(str, i, length) % row_length + i * row_length;
+        n[i] = (v[position] - v_d[position]) * Count_Hash[(str[length - 1] + position) & 1];
+        //n[i] = (counter[position].future + counter[position].now) * Count_Hash[(str[length - 1] + position) & 1];
+    }
+
+    std::sort(n, n + hash_number);
+
+    if (((n[hash_number / 2] + n[(hash_number / 2) - 1]) / 2 ) <= 0){
+        return 0;
+    }
+
+    return (n[hash_number / 2] + n[(hash_number / 2) - 1]) / 2;
+
+}*/
 
 
 int Bucket::q_memory(){
@@ -138,7 +390,7 @@ void Bucket::phaseout(int i1, int i2, int time_stamp){
                 int v_prime = myqf.counter / (myqf.last - myqf.init + 1);
                 myv = myv - (t*v_prime);
                 myq.front().counter -= (t * v_prime);
-                myq.front().init = time_stamp - cycle + 1;
+                myq.front().init = time_stamp - cycle + 1;//= myq.front().init + 1;?
             }
         }
     }

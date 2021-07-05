@@ -42,8 +42,8 @@ void Recent_Counter::CM_Init(const unsigned char* str, int length, unsigned long
 }
 
 void Recent_Counter::CU_Init(const unsigned char* str, int length, unsigned long long int num){
-    int k = clock_pos / row_length;
     Clock_Go(num * step);
+    int k = clock_pos / row_length;
     unsigned int position = Hash(str, k ,length) % row_length + k * row_length;
     if(position < clock_pos){
         k = (k + 1) % hash_number;
@@ -73,12 +73,13 @@ unsigned int Recent_Counter::Query(const unsigned char* str, int length){
 
 static int Count_Hash[2] = {-1, 1};
 void Recent_Counter::CO_Init(const unsigned char *str, int length, unsigned long long num){
-    unsigned int position;
+    unsigned int position,countHash;
     Clock_Go(num * step);
     for(int i = 0;i < hash_number;++i){
         position = Hash(str, i, length) % row_length + i * row_length;
+	countHash = Hash(str,i+1, length) & 1;
         counter[position].count[(cycle_num + (position < clock_pos)) % field_num] +=
-                Count_Hash[(str[length - 1] + position) & 1];
+                Count_Hash[countHash];
     }
 }
 
@@ -90,14 +91,15 @@ int Recent_Counter::CO_Query(const unsigned char *str, int length){
     for(int i = 0;i < hash_number;++i)
     {
         unsigned int position = Hash(str, i, length) % row_length + i * row_length;
+	unsigned int countHash =  Hash(str,i+1, length) & 1;
         /*
         if(clock_pos >= position){
-            n[i] = (counter[position].Total() * Count_Hash[(str[length - 1] + position) & 1]) * row_length * hash_number / (row_length * hash_number + clock_pos - position);
+            n[i] = (counter[position].Total() * Count_Hash[countHash ]) * row_length * hash_number / (row_length * hash_number + clock_pos - position);
         }else{
-            n[i] = (counter[position].Total() * Count_Hash[(str[length - 1] + position) & 1]) * row_length * hash_number / (row_length * hash_number * 2 - (position - clock_pos));
+            n[i] = (counter[position].Total() * Count_Hash[countHash ]) * row_length * hash_number / (row_length * hash_number * 2 - (position - clock_pos));
 
         }*/
-        n[i] = counter[position].Total() * Count_Hash[(str[length - 1] + position) & 1] ;
+        n[i] = counter[position].Total() * Count_Hash[countHash ] ;
         
     }
 

@@ -1,103 +1,135 @@
+#include <iostream>
 #include <fstream>
 #include <iomanip>
-#include <map>
-#include <math.h>
-#include "../splitter.h"
-#include "../data.h"
+#include <queue>
+#include <time.h>
+#include <unordered_map>
+#include <unordered_set>
+#include "../MMap.h"
+#include "../splitter.cpp"
+#include "../data.cpp"
+#include "../hash_class.cpp"
 
-map<Data, int> mp;
+#define NtpTest 1
+
+using namespace std;
+unordered_map<Data, int, My_Hash> mp;
+unordered_set<Data, My_Hash> st;
 
 //argv[1]:cycle
 //argv[2]:hash_number
-//argv[3]:row_length
+//argv[3]:Memory
 //argv[4]:file
 //argv[5]:input_num_max
 //argv[6]:out_file
 //argv[7]:out_model
 //argv[8]:label_name
-int main(int argc, char* argv[])
-{
-    double tau = 0.05;
+//argv[9]:field
+
+void Read_File(int argc,char*argv[]){
+    double tau = atof(argv[3]);
     double mu = 1.5;
-    int cycle = 50000;
-    int hash_number = 3;
-    int row_length = 2000;
-    int input_num_max = 500000;
-    int out_model = 2;
+    int hash_number = atoi(argv[4]);
+    int row_length = atoi(argv[1]);
+
+    int input_num_max =  1000000 * 8;
+    unsigned long long int num = 0;
+
+    double CM_dif = 0, CU_dif = 0, CO_dif = 0;
+    double CM_ae = 0,  CU_ae = 0,  CO_ae = 0;
+    double CM_re = 0,  CU_re = 0,  CO_re = 0;
+    int Test_num = 0;
+
+    LoadResult ret = Load(argv[2]);
+
+    Data packet;
+    Data* indat = (Data*)(ret.start);
+    queue<Data> dat;
+
+    int cycle = (indat[input_num_max -1].timestamp - indat[0].timestamp ) / 8;
 
     Bucket cm(cycle, tau, mu, hash_number, row_length);
-    //Bucket cu(cycle, tau, mu, hash_number, row_length);
-    //Bucket co(cycle, tau, mu, hash_number, row_length);
-    int input_num = 0;
 
-    Data *dat = new Data[cycle];
-    memset(dat, 0, cycle * sizeof(Data));
-
-    FILE* file = fopen("../../../../data/formatted00.dat", "rb");
-    Data packet;
- 
-    double are_cm = 0;
-    double aae_cm = 0;
-    double are_cu = 0;
-    double aae_cu = 0;
-    double are_co = 0;
-    double aae_co = 0;
-    cout <<"SWCM,Arrivals,ARE"<<endl;
-    while(fread(packet.str, DATA_LEN, 1, file) > 0){
-        if(input_num >= input_num_max){
+    cout <<"ECM,Arrivals,ARE"<<endl;
+    int clock_ = clock();
+    int latestT = indat[0].timestamp;
+	cerr << cycle << endl << sizeof(Data) << endl << latestT<<endl;
+    while(num < input_num_max)
+    {
+        packet = indat[num];
+        if(num > input_num_max){
             break;
         }
-        if(input_num >= cycle){
-            mp[dat[input_num % cycle]] -= 1;
+#ifndef tpTest
+        // unsigned int pos = num % cycle;
+        while(dat.size() && packet.timestamp - dat.front().timestamp >= cycle){
+            mp[dat.front()] -= 1;
+            dat.pop();
         }
-        dat[input_num % cycle] = packet;
-        if(mp.find(packet) == mp.end()){
+
+        dat.push(packet);
+        // dat[pos] = packet;
+#endif
+        cm.update(packet.str, DATA_LEN, packet.timestamp);
+#ifndef tpTest
+        if(mp.find(packet) == mp.end())
             mp[packet] = 1;
-        }
-        else{
+        else
             mp[packet] += 1;
-        }
-        cm.update(packet.str, DATA_LEN, input_num);
-        //cu.cu_update(packet.str, DATA_LEN, input_num);
-        //co.count_update(packet.str, DATA_LEN, input_num);
+	//if(num % 10 == 0 ) cerr << num;
+        //cerr << packet.timestamp << endl;
+        if( packet.timestamp - indat[0].timestamp >= 2*cycle){
+		
+            // if(num%(cycle/5) ==0){
+            if((int)packet.timestamp - latestT + 1>= cycle/10){ 
+                latestT = packet.timestamp;
+                st.clear();
+                for(auto i = mp.begin(); i!= mp.end();i++){
+			if ( i->second == 0) continue;
+                // for(int i=0;i<cycle;++i){
+                    // if(st.find(dat[i]) != st.end()) continue;
+                    // st.insert(dat[i]);
+                    Test_num ++; 
+                    CM_dif = fabs((double)cm.query(i->first.str,DATA_LEN) - i->second );
+                    CM_ae += CM_dif; 
+                    CM_re += CM_dif/i->second;
 
-        double dif_cm = fabs(cm.query(packet.str, DATA_LEN) - mp[packet]);
-        //double dif_cu = fabs(cu.query(packet.str, DATA_LEN) - mp[packet]);
-        //double dif_co = fabs(co.count_query(packet.str, DATA_LEN) - mp[packet]);
-
-        are_cm = are_cm + (dif_cm/mp[packet]);
-        aae_cm = aae_cm + dif_cm;
-
-        //are_cu = are_cu + (dif_cu/mp[packet]);
-        //aae_cu = aae_cu + dif_cu;
-
-        //are_co = are_co + (dif_co/mp[packet]);
-        //aae_co = aae_co + dif_co;
-
-        
-        switch(out_model){
-        case 1:
-            if(input_num % cycle == 0 && input_num > 0){
-                //fout << argv[8]<<","  << (double)input_num <<"," << (double)cm.q_memory() <<  endl;
-                cout << "SWCM"<<","  << (double)input_num <<"," << (double)cm.q_memory() <<  endl;
+                    // cerr << CM_dif << " "  << mp[dat[i]] <<endl;
+                }
+                
+                cerr << "ECM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 << endl;
+                cerr << "ECM  are" << "," << num<< "," << CM_re / Test_num << endl;
+                cerr << "ECM  are" << "," << num<< "," << CM_ae / Test_num << endl;
             }
-            break;
-        case 2:
-            if(input_num % cycle == 0 && input_num > 0){
-                //fout << argv[8]<<","  << (double)input_num <<"," << are_cm/input_num <<  endl;
-                cout << "SWCM"<<","  << (double)input_num <<"," << are_cm/input_num <<  endl;
-            }
-            break;
-        case 3:
-            if(input_num % cycle == 0 && input_num > 0){
-                //fout << argv[8]<<","  << (double)input_num <<"," << aae_cm/input_num <<  endl;
-                cout << "SWCM"<<","  << (double)input_num <<"," << aae_cm/input_num <<  endl;
-            }
-            break;
-        
         }
 
-        input_num ++;                       
+#endif
+        num++;
+
+        
     }
+#ifndef tpTest    
+		cout << "ECM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 << endl;
+                cout << "E-CM are" << "," << num << "," << CM_re / Test_num << endl;
+                cout << "E-CM aae" << "," << num << "," << CM_ae / Test_num << endl;
+#else
+    double tp = (double)num /1000000 / ((double)(clock()-clock_)/CLOCKS_PER_SEC);
+cout << "ECM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 << endl;
 
+    cout << "TP" << tpTest << "," << num << "," << tp << endl;
+#endif
+}
+
+int main(int argc, char* argv[]){
+    Read_File(argc, argv);
+    // printf("---\n");
+    // Read_File(20);
+    // printf("---\n");
+    // Read_File(25);
+    // printf("---\n");
+    // Read_File(30);
+    // printf("---\n");
+    // Read_File(35);
+    // printf("---\n");
+    // Read_File(40);
 }

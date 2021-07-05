@@ -7,6 +7,7 @@
 #include <string.h>
 #include <math.h>
 #include <vector>
+#include <deque>
 #include <algorithm>
 #include "hash_class.h"
 
@@ -30,7 +31,7 @@ public:
     int hash_number;
     int row_length;
 
-    vector<Splitter>* q;
+    deque<Splitter>* q;
     //vector<Splitter>* q_d;
     int* v;
     //int* v_d;
@@ -45,7 +46,7 @@ public:
     //int q_memory_count();
 
     int query(const unsigned char* str, int length);//query an item
-  // int count_query(const unsigned char* str, int length);
+    int count_query(const unsigned char* str, int length);
 
     void phaseout(int i1, int i2, int time_stamp);//algorithm speedup
     void print(int i1, int i2);
