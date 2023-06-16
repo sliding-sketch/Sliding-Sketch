@@ -61,7 +61,7 @@ void Sketch::Delete_Bucket(Bucket *bucket){
 
 void Sketch::Delete_Counter(Counter *counter){
     counter_map.erase(counter->ID);
-    // memory -= (sizeof(DATA_TYPE) + sizeof(Counter*) + 8) * Mt; //the memory for hash table is not dynamicly allocated.
+    // memory -= (sizeof(Data) + sizeof(Counter*) + 8) * Mt; //the memory for hash table is not dynamicly allocated.
     memory -= counter_size;
     memory -= counter->que.size() * (sizeof(int) + 8); // one int and one counter;
     if(counter->next != NULL){
@@ -70,7 +70,7 @@ void Sketch::Delete_Counter(Counter *counter){
     delete counter;
 }
 
-void Sketch::Init(DATA_TYPE data, int t){
+void Sketch::Init(Data data, int t){
     if(counter_map.find(data) != counter_map.end()){
         Counter* temp = counter_map[data];
         int value = temp->father->value;
@@ -97,7 +97,7 @@ void Sketch::Init(DATA_TYPE data, int t){
             }
         }
         else{
-            //      memory -= (sizeof(DATA_TYPE) + sizeof(Counter*)+8) * Mt;
+            //      memory -= (sizeof(Data) + sizeof(Counter*)+8) * Mt;
             memory -= counter_size;
             memory -= temp->que.size() * (sizeof(int) + 8);
 
@@ -148,11 +148,11 @@ void Sketch::Init(DATA_TYPE data, int t){
         // Add(counter, &bucket_map[1]);
         min_num = 1;
         memory += counter_size;
-        //   memory += (sizeof(DATA_TYPE) + sizeof(Counter*)+8) * Mt;
+        //   memory += (sizeof(Data) + sizeof(Counter*)+8) * Mt;
     }
 }
 
-void Summary::Init(DATA_TYPE data,int t){
+void Summary::Init(Data data,int t){
     if(t % cycle == 0){ // 每隔一个周期 删除旧的sketch
         swap(S[0],S[1]);
         delete S[1];
@@ -161,7 +161,7 @@ void Summary::Init(DATA_TYPE data,int t){
     S[1]->Init(data,t);
 }
 
-int Sketch::Query(DATA_TYPE data, int t){
+int Sketch::Query(Data data, int t){
     if(counter_map.find(data) == counter_map.end())
         return -1;
     else{
@@ -177,7 +177,7 @@ int Sketch::Query(DATA_TYPE data, int t){
     }
 }
 
-int Summary::Query(DATA_TYPE data, int t){
+int Summary::Query(Data data, int t){
     return S[0]->Query(data,t) + S[1]->Query(data,t);
 }
 
