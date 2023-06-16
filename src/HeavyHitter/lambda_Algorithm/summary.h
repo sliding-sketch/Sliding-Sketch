@@ -34,9 +34,9 @@ public:
     Bucket* father;
     Counter* prev;
     Counter* next;
-    DATA_TYPE ID;
+    Data ID;
     queue<int> que;
-    Counter(DATA_TYPE data):ID(data){
+    Counter(Data data):ID(data){
         l = 0;
         father = NULL;
         prev = next = NULL;
@@ -46,7 +46,7 @@ public:
 class Sketch{
 public:
     Bucket* bucket_head;
-    unordered_map<DATA_TYPE, Counter*> counter_map;
+    unordered_map<Data, Counter*, My_Hash> counter_map;
     int cycle_i;
     int MAX_SIZE;
     int datalen;
@@ -66,8 +66,8 @@ public:
     void Add(Counter* counter, Bucket* bucket);
     void Connect(Counter* ca, Counter* cb);
 
-    void Init(DATA_TYPE data,int t);
-    int Query(DATA_TYPE data, int t);
+    void Init(Data data,int t);
+    int Query(Data data, int t);
 };
 
 class Summary{		//datalen is the length of the ID;
@@ -84,8 +84,8 @@ public:
     Summary(int num, int dl, int _cycle, int _para_lambda);
     ~Summary();
 
-    int Query(DATA_TYPE data, int t);
-    void Init(DATA_TYPE data, int t);//update an item
+    int Query(Data data, int t);
+    void Init(Data data, int t);//update an item
 };
 
 
