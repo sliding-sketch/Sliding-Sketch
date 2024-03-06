@@ -42,8 +42,8 @@ void Hash_Num(int argc, char **argv){
     uint CYCLE = 100000;
     uint memory_begin = 100000;
     uint memory_interval = 50000;
-    uint arrival_begin = 10000000;
-    uint arrival_interval = 723331;
+    uint arrival_begin = 100000;
+    uint arrival_interval = 72331;
 
     Node packet;
     FILE *input;
@@ -131,8 +131,8 @@ void Error_Rate(int argc, char **argv){
     uint FBF_Num = 10;
     uint memory_begin = 100000;
     uint memory_interval = 50000;
-    uint arrival_begin = 10000000;
-    uint arrival_interval = 723331;
+    uint arrival_begin = 100000;
+    uint arrival_interval = 72331;
 
     Node packet;
     FILE *input;
