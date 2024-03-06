@@ -25,8 +25,8 @@ void Insertion_Speed(int argc, char** argv);
 
 int main(int argc, char** argv){
   //  Insertion_Speed(argc, argv);
-    Error_Rate(argc, argv);
-    //Hash_Num(argc, argv);
+   Error_Rate(argc, argv);
+  //  Hash_Num(argc, argv);
 }
 
 /*
@@ -40,11 +40,11 @@ int main(int argc, char** argv){
 
 void Hash_Num(int argc, char **argv){
    // char* input_file = "../../data/formatted00.dat";
-    uint CYCLE = 10000;
-    uint memory_begin = 10000;
-    uint memory_interval = 5000;
-    uint arrival_begin = 10000;
-    uint arrival_interval = 7331;
+    uint CYCLE = 100000;
+    uint memory_begin = 100000;
+    uint memory_interval = 100000;
+    uint arrival_begin = 100000;
+    uint arrival_interval = 72331;
 
     Node packet;
     FILE *input;
@@ -57,7 +57,9 @@ void Hash_Num(int argc, char **argv){
 
         uint memory = memory_begin + i * memory_interval;
         input = fopen("../../data/formatted00.dat","rb");
-        cout << memory << endl;
+        cout << "memory " <<memory<<"Byte"<<endl;
+
+	memory = memory *8; // length of bit string
 
         for(int hash = 1;hash < 6;++hash){
             slide[hash] = new Sliding_Bloom(ceil(memory/(double)hash), 2*hash, CYCLE);
@@ -129,11 +131,11 @@ void Error_Rate(int argc, char **argv){
     uint SL_Hash = 10;
     uint FBF_Hash = 8;
     uint FBF_Num = 10;
-	uint CYCLE = 10000;
+	uint CYCLE = 100000;
     uint memory_begin = 100000;
-    uint memory_interval = 50000;
-    uint arrival_begin = 10000;
-    uint arrival_interval = 7331;
+    uint memory_interval = 100000;
+    uint arrival_begin = 100000;
+    uint arrival_interval = 72331;
     
     Node packet;
     FILE *input;
@@ -145,8 +147,9 @@ void Error_Rate(int argc, char **argv){
         unordered_map<Data, int, My_Hash> mp;
 
         uint memory = memory_begin + i * memory_interval;
-        cout << memory << endl;
+        cout << "memory " <<memory<<"Byte"<< endl;
         input = fopen("../../data/formatted00.dat","rb");
+	memory = memory *8; // length of bit string;
 
         slide = new Sliding_Bloom(ceil(memory / (double)SL_Hash), SL_Hash, CYCLE);
         forget = new Forget_Bloom(ceil(memory*2 / (double)FBF_Num), FBF_Hash, FBF_Num, CYCLE);
@@ -220,12 +223,12 @@ void Error_Rate(int argc, char **argv){
 
 void Insertion_Speed(int argc, char **argv){
    // char* input_file = "../../data/formatted00.dat";
-    uint CYCLE = 10000;
+    uint CYCLE = 100000;
     uint SL_Hash = 10;
     uint FBF_Hash = 8;
     uint FBF_Num = 10;
     uint memory_begin = 100000;
-    uint memory_interval = 50000;
+    uint memory_interval = 100000;
 
     double duration;
     uint num = 0;
@@ -237,7 +240,8 @@ void Insertion_Speed(int argc, char **argv){
 
     for(uint i = 1;i < 5;++i){
         uint memory = memory_begin + i * memory_interval;
-        cout << memory << endl;
+        cout << "memory " <<memory<<"Byte"<< endl;
+	memory = memory * 8;
 
         for(int j = 1;j <= 5;++j){
             slide = new Sliding_Bloom(ceil(memory / (double)SL_Hash), SL_Hash, CYCLE);
@@ -252,7 +256,7 @@ void Insertion_Speed(int argc, char **argv){
 
             fclose(input);
             duration = ((double)(final-start))/CLOCKS_PER_SEC;
-            cout << (num + 0.0)/ duration / 1000000.0 << endl;
+            cout <<"sliding BF speed "<< (num + 0.0)/ duration / 1000000.0 << endl;
             delete slide;
         }
 
@@ -269,7 +273,7 @@ void Insertion_Speed(int argc, char **argv){
 
             fclose(input);
             duration = ((double)(final-start))/CLOCKS_PER_SEC;
-            cout << (num + 0.0)/ duration / 1000000.0 << endl;
+            cout <<"forget BF speed "<< (num + 0.0)/ duration / 1000000.0 << endl;
             delete forget;
         }
 
