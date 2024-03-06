@@ -101,7 +101,7 @@ void Read_File(int argc, char* argv[]){
             if((yes + no )== 0 ){
                     cout <<"lambda_Algorithm,Arrivals:"<<num << ",Precision Rate:"<<0<< endl;
             }else{
-                cout <<"lambda_Algorithm,Arrivals:"<<num << ",Precision Rate:"<<(yes + 0.0)/heavy<< endl;
+                cout <<"lambda_Algorithm,Arrivals:"<<num << ",Precision Rate:"<<(yes + 0.0)/(yes+no)<< endl;
             } 
 
 
