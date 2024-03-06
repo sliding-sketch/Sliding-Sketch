@@ -40,11 +40,11 @@ int main(int argc, char** argv){
 
 void Hash_Num(int argc, char **argv){
    // char* input_file = "../../data/formatted00.dat";
-    uint CYCLE = 1000;
+    uint CYCLE = 10000;
     uint memory_begin = 10000;
     uint memory_interval = 5000;
-    uint arrival_begin = 1000;
-    uint arrival_interval = 731;
+    uint arrival_begin = 10000;
+    uint arrival_interval = 7331;
 
     Node packet;
     FILE *input;
@@ -198,10 +198,10 @@ void Error_Rate(int argc, char **argv){
             num++;
         }
 
-        cout << "slide positive: " << slide_err1/all1 << endl;
-        cout << "slide negative: " << slide_err2/all2 << endl;
-        cout << "forget positive: " << forget_err1/all1 << endl;
-        cout << "forget negative: " << forget_err2/all2 << endl;
+        cout << "slide false negative: " << slide_err1/all1 << endl;
+        cout << "slide false positive: " << slide_err2/all2 << endl;
+        cout << "forget false negative: " << forget_err1/all1 << endl;
+        cout << "forget false positive: " << forget_err2/all2 << endl;
         delete slide;
         delete forget;
         fclose(input);
@@ -220,7 +220,7 @@ void Error_Rate(int argc, char **argv){
 
 void Insertion_Speed(int argc, char **argv){
    // char* input_file = "../../data/formatted00.dat";
-    uint CYCLE = 100000;
+    uint CYCLE = 10000;
     uint SL_Hash = 10;
     uint FBF_Hash = 8;
     uint FBF_Num = 10;
