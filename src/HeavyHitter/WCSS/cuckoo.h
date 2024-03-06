@@ -55,8 +55,8 @@ class cuckoo
 	~cuckoo()
 	{
 		for(int i=0;i<hash_num;i++)
-			delete array[i];
-		delete array;
+			delete []array[i];
+		delete []array;
 	}
 	void clear()
 	{
