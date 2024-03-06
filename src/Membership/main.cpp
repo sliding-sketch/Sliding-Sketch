@@ -23,8 +23,8 @@ void Hash_Num(int argc, char** argv);
 void Insertion_Speed(int argc, char** argv);
 
 int main(int argc, char** argv){
-    Insertion_Speed(argc, argv);
-    //Error_Rate(argc, argv);
+    //Insertion_Speed(argc, argv);
+    Error_Rate(argc, argv);
     //Hash_Num(argc, argv);
 }
 
