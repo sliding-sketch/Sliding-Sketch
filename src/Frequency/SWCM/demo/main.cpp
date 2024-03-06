@@ -5,7 +5,6 @@
 #include <time.h>
 #include <unordered_map>
 #include <unordered_set>
-#include "../MMap.h"
 #include "../splitter.cpp"
 #include "../data.cpp"
 #include "../hash_class.cpp"
@@ -27,37 +26,42 @@ unordered_set<Data, My_Hash> st;
 //argv[9]:field
 
 void Read_File(int argc,char*argv[]){
-    double tau = atof(argv[3]);
+    double tau = 0.2;
     double mu = 1.5;
-    int hash_number = atoi(argv[4]);
-    int row_length = atoi(argv[1]);
+    int hash_number = 5;
+    int row_length = 10000;
+    cout<<"memory of SWCM approximate to 5MB, but cannot be precisely controlled"<<endl;
 
-    int input_num_max =  1000000 * 8;
     unsigned long long int num = 0;
-
+    int Test_num = 0;
     double CM_dif = 0, CU_dif = 0, CO_dif = 0;
     double CM_ae = 0,  CU_ae = 0,  CO_ae = 0;
     double CM_re = 0,  CU_re = 0,  CO_re = 0;
-    int Test_num = 0;
 
-    LoadResult ret = Load(argv[2]);
-
+   	FILE* file = fopen("../../../../data/formatted00.dat","rb");
     Data packet;
-    Data* indat = (Data*)(ret.start);
+    vector<Data> indat;
+    unsigned int latestT = 0;
+    while(fread(packet.str, DATA_LEN, 1, file) > 0)
+    {
+    	packet.timestamp = indat.size(); // as the dataset provided in the demo has no timestamp, we use count-based sliding window. In other words, each item will get a timestamp equal to its index in the datasteam, and the length of the
+		// sliding window is equal to the number of items in it. 
+    	indat.push_back(packet);
+	}
+	unsigned int input_num = indat.size();
     queue<Data> dat;
 
-    int cycle = (indat[input_num_max -1].timestamp - indat[0].timestamp ) / 8;
+    int cycle = 200000; // the length of the sliding window, here we use count based sliding window. 
+    cout<<"window size "<<cycle<<endl;
 
     Bucket cm(cycle, tau, mu, hash_number, row_length);
 
-    cout <<"ECM,Arrivals,ARE"<<endl;
+    cout <<"SWCM,Arrivals,ARE"<<endl;
     int clock_ = clock();
-    int latestT = indat[0].timestamp;
-	cerr << cycle << endl << sizeof(Data) << endl << latestT<<endl;
-    while(num < input_num_max)
+    while(num < input_num)
     {
         packet = indat[num];
-        if(num > input_num_max){
+        if(num > input_num){
             break;
         }
 #ifndef tpTest
@@ -81,7 +85,7 @@ void Read_File(int argc,char*argv[]){
         if( packet.timestamp - indat[0].timestamp >= 2*cycle){
 		
             // if(num%(cycle/5) ==0){
-            if((int)packet.timestamp - latestT + 1>= cycle/10){ 
+            if((int)packet.timestamp - latestT + 1>= cycle/5){ 
                 latestT = packet.timestamp;
                 st.clear();
                 for(auto i = mp.begin(); i!= mp.end();i++){
@@ -97,9 +101,9 @@ void Read_File(int argc,char*argv[]){
                     // cerr << CM_dif << " "  << mp[dat[i]] <<endl;
                 }
                 
-                cerr << "ECM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 << endl;
-                cerr << "ECM  are" << "," << num<< "," << CM_re / Test_num << endl;
-                cerr << "ECM  are" << "," << num<< "," << CM_ae / Test_num << endl;
+                cerr << "SWCM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 <<"MB"<<endl;
+                cerr << "SWCM  are" << "," << num<< "," << CM_re / Test_num << endl;
+                cerr << "SWCM  aae" << "," << num<< "," << CM_ae / Test_num << endl;
             }
         }
 
@@ -109,12 +113,13 @@ void Read_File(int argc,char*argv[]){
         
     }
 #ifndef tpTest    
-		cout << "ECM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 << endl;
-                cout << "E-CM are" << "," << num << "," << CM_re / Test_num << endl;
-                cout << "E-CM aae" << "," << num << "," << CM_ae / Test_num << endl;
+				cout<<"total:"<<endl;
+		        cout << "SWCM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 <<"MB"<<endl;
+                cout << "SWCM are" << "," << num << "," << CM_re / Test_num << endl;
+                cout << "SWCM aae" << "," << num << "," << CM_ae / Test_num << endl;
 #else
     double tp = (double)num /1000000 / ((double)(clock()-clock_)/CLOCKS_PER_SEC);
-cout << "ECM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 << endl;
+cout << "SWCM  mem" << "," << num << "," << cm.q_memory()/1024.0/1024.0 << endl;
 
     cout << "TP" << tpTest << "," << num << "," << tp << endl;
 #endif
