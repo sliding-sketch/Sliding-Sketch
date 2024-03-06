@@ -7,9 +7,10 @@
 #include <queue>
 #include <math.h>
 #include <unordered_map>
-#include "sliding_bloom.h"
-#include "forget_bloom.h"
-#include "data.h"
+#include "./definition.h"
+#include "./data.h"
+#include "./sliding_bloom.h"
+#include "./forget_bloom.h"
 
 using namespace std;
 
@@ -23,7 +24,7 @@ void Hash_Num(int argc, char** argv);
 void Insertion_Speed(int argc, char** argv);
 
 int main(int argc, char** argv){
-    //Insertion_Speed(argc, argv);
+  //  Insertion_Speed(argc, argv);
     Error_Rate(argc, argv);
     //Hash_Num(argc, argv);
 }
@@ -39,11 +40,11 @@ int main(int argc, char** argv){
 
 void Hash_Num(int argc, char **argv){
    // char* input_file = "../../data/formatted00.dat";
-    uint CYCLE = 100000;
-    uint memory_begin = 100000;
-    uint memory_interval = 50000;
-    uint arrival_begin = 100000;
-    uint arrival_interval = 72331;
+    uint CYCLE = 1000;
+    uint memory_begin = 10000;
+    uint memory_interval = 5000;
+    uint arrival_begin = 1000;
+    uint arrival_interval = 731;
 
     Node packet;
     FILE *input;
@@ -125,15 +126,15 @@ void Hash_Num(int argc, char **argv){
 
 void Error_Rate(int argc, char **argv){
    // char* input_file = "../../data/formatted00.dat";
-    uint CYCLE = 100000;
     uint SL_Hash = 10;
     uint FBF_Hash = 8;
     uint FBF_Num = 10;
+	uint CYCLE = 10000;
     uint memory_begin = 100000;
     uint memory_interval = 50000;
-    uint arrival_begin = 100000;
-    uint arrival_interval = 72331;
-
+    uint arrival_begin = 10000;
+    uint arrival_interval = 7331;
+    
     Node packet;
     FILE *input;
     Sliding_Bloom* slide;
@@ -274,5 +275,4 @@ void Insertion_Speed(int argc, char **argv){
 
     }
 }
-
 
