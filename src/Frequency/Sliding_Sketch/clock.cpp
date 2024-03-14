@@ -67,6 +67,7 @@ void Recent_Counter::CU_Init(const unsigned char* str, int length, unsigned long
 unsigned int Recent_Counter::Query(const unsigned char* str, int length){
     int query_hash_number = 3;
 
+    // rowの何番目を見ているか？
     unsigned int k = clock_pos / row_length;
     unsigned int position = 0;
     int min_num = INT32_MAX;
@@ -76,19 +77,20 @@ unsigned int Recent_Counter::Query(const unsigned char* str, int length){
 
     k = (k + 1) % hash_number;
     int l = 0;
-    for (unsigned int i = k; (i + hash_number - k) % hash_number <= query_hash_number; i = (i + 1) % hash_number) {
+    for (unsigned int i = k; (i + hash_number - k) % hash_number < query_hash_number; i = (i + 1) % hash_number) {
         for (unsigned int j = 0; j < field_num; ++j) {
             position = Hash(str, (i * field_num + j) % 13, length) % row_length + i * row_length;
             min_num = min(counter[position].count[j], min_num);
         }
-        std::cout << min_num << " ";
+        // Dump minimum num candidate
+        //std::cout << min_num << " ";
         if (min_num < prev_min_num || min_num == prev_min_num) {
             min_pos = l;
         }
         prev_min_num = min_num;
         l++;
     }
-    std::cout << std::endl;
+    //std::cout << std::endl;
 
     count_[min_pos]++;
 
