@@ -26,6 +26,8 @@ Recent_Counter::Recent_Counter(int c, int l, int _row_length, int _hash_numberbe
         counter[i].field_num = _field_num;
         memset(counter[i].count, 0, _field_num * sizeof(int));
     }
+
+    count_.resize(5, 0);
 }
 
 Recent_Counter::~Recent_Counter(){
@@ -63,10 +65,32 @@ void Recent_Counter::CU_Init(const unsigned char* str, int length, unsigned long
 }
 
 unsigned int Recent_Counter::Query(const unsigned char* str, int length){
-    unsigned int min_num = 0x7fffffff;
+    int query_hash_number = 3;
 
-    for(int i = 0;i < hash_number;++i)
-        min_num = min(counter[Hash(str, i, length) % row_length + i * row_length].Total(), min_num);
+    unsigned int k = clock_pos / row_length;
+    unsigned int position = 0;
+    int min_num = INT32_MAX;
+    int prev_min_num = INT32_MAX;
+
+    int min_pos = 0;
+
+    k = (k + 1) % hash_number;
+    int l = 0;
+    for (unsigned int i = k; (i + hash_number - k) % hash_number <= query_hash_number; i = (i + 1) % hash_number) {
+        for (unsigned int j = 0; j < field_num; ++j) {
+            position = Hash(str, (i * field_num + j) % 13, length) % row_length + i * row_length;
+            min_num = min(counter[position].count[j], min_num);
+        }
+        std::cout << min_num << " ";
+        if (min_num < prev_min_num || min_num == prev_min_num) {
+            min_pos = l;
+        }
+        prev_min_num = min_num;
+        l++;
+    }
+    std::cout << std::endl;
+
+    count_[min_pos]++;
 
     return min_num;
 }
@@ -113,5 +137,11 @@ void Recent_Counter::Clock_Go(unsigned long long int num){
         if(clock_pos == 0){
             cycle_num = (cycle_num + 1) % field_num;
         }
+    }
+}
+
+void Recent_Counter::DumpCounter(){
+    for (int i=0;i<5;i++){
+        std::cout << "i:" << i << " " << count_[i] << std::endl;
     }
 }

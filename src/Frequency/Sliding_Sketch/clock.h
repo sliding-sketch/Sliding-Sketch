@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string.h>
 #include <algorithm>
+#include <vector>
 #include "definition.h"
 #include "hash_class.h"
 
@@ -19,6 +20,7 @@ public :
     int hash_number;
     int field_num;
     unsigned long long int last_time;
+    std::vector<int> count_;
 
     Recent_Sketch(unsigned int c, unsigned int l, int _row_length, int _hash_number, int _field_num):
         len(l),step(l*(_field_num-1)/c),row_length(_row_length),hash_number(_hash_number),field_num(_field_num){
@@ -54,6 +56,7 @@ public:
     void CU_Init(const unsigned char* str, int length, unsigned long long int num);//CU Sketch update an item
     int CO_Query(const unsigned char* str, int length);//Count Sketch query an item
     unsigned int Query(const unsigned char* str, int length);//CM(CU) Sketch update an item
+    void DumpCounter();//Dump counter_ member variable
 };
 
 #endif // CLOCK_H

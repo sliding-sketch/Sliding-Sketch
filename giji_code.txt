@@ -1,0 +1,73 @@
+# 入ってくるコード
+init do
+  c1 ← x
+  c2 ← y 
+  count[1...c1, 1...c2] ← 0 # Count-Min Sketch
+  # 0を持たないように改良する
+  array element_count # 新たなSketch,arrayの宣言のみ
+  更新間隔 ← δ # δ:element_countを更新する間隔
+  t ← 0 # 経過時間
+  hash(行数,要素)関数を定義，hash関数は引数を受け取り，{x|1≦x≦c2}を返す関数
+end init
+
+upon <Sample | j> do # Sampleは文字列，1文字ずつ取り出してjに代入してイテレーション
+  t ← t + 1
+  initialize_element
+  for i = 1 to c1 do
+    update(j)
+  end for
+end upon
+
+struct Frecuency
+  int key
+  int count ← 0
+end struct
+
+fucntion LinearSearch(array, target)
+  for i = 1 to array.size
+    if (array[i].key = target)
+      return i
+    end if
+    return -1
+  end for
+end function
+
+function GetFrecuency(j)
+  return min{ count[i,hash(i,j)] + element_count[j] | 1≦i≦c1 }
+end function
+
+function update(j)
+  # element_countのkeyを探す方法は今は線形探索で設計してみる
+  target_key ← LinearSearch(element_count, j)
+  if (target_key != -1) then # target_keyが見つかったら
+    element_count[target_key].count ← element_count[target_key].count + 1
+  else
+    frecuency = new Frecuency{ key: j, count: 0 }
+    element_count.push ← frecuency
+  end if
+end function
+
+function initialize_element_count # elemnt_countの値をcountへ代入する
+  if (t % 更新間隔 = 0) then
+    for i = 1 to c1 do
+      frecuency_confirmations[1...c2] ← 0
+      for k = 1 to element_count.size do
+        # frecuency_confirmations[1...c2]
+        # キャッシュの衝突を検知したい
+        key ← element_count[k].key
+        frecuency_confirmations[hash(i,key)] ← 
+            max(frecuency_confirmations[hash(i,key)], element_count[k].count)
+      end for
+
+      for k = 1 to frecuency_confirmations.size do
+        if (frecuency_confirmations[k] != 0) then
+          # element_count[k] ← element_count[k] + frecuency_confirmations[k]
+          count[k] ← count[k] + frecuency_confirmations[k]
+          # count[?][k] ← count[?][k] + frecuency_confirmations[k] なのでは？
+        end if
+      end for
+      frecuency_confirmations[1...c2] ← 0
+    end for
+    array element_count # 再initialize
+  end if
+end function
